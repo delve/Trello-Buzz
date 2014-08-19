@@ -36,10 +36,49 @@ namespace Trello_Buzz
                 Console.WriteLine("No Match :("); 
             }
             Console.WriteLine();
-            Console.WriteLine("Next we're going to perform an exhaustive search for strings that won't crack under the above algorithm. Because I'm curious and have spare processor cycles.");
+            Console.WriteLine("Next we're going to perform an exhaustive search for strings that won't crack under this algorithm. Because I'm curious and have spare processor cycles.");
             Console.ReadLine();
+            Console.WriteLine("===============================================");
+            Console.WriteLine("============Output of crack test===============");
+            Console.WriteLine("===============================================");
+            double tested = 0;
+            double failed = 0;
+            checkCrack("", 9, ref tested, ref failed);
+            Console.WriteLine("Tested {0} strings; {1} failed to crack.", tested, failed);
+            Console.ReadLine();
+        }
 
-
+        static void checkCrack(string testVal, int maxLen, ref double tested, ref double failed)
+        {
+            if (testVal.Length < maxLen)
+            {
+                if (testVal.Length < maxLen / 2 && tested > 0)
+                {
+                    Console.WriteLine("Processed {0} strings; {1}% complete", tested, tested / Math.Pow(9, 15));
+                }
+                for (int i = 0; i < 16; i++)
+                {
+                    checkCrack(String.Concat(testVal, TrelloBuzz.FIZZLETTERS[i]), maxLen, ref tested, ref failed);
+                }
+            }
+            else
+            {
+                double hash = TrelloBuzz.hash(testVal);
+                string candidate;
+                tested += 1;
+                if (TrelloBuzz.crackHash(hash, out candidate))
+                {
+                    //Console.WriteLine("tested {0}", testVal);
+                    return; 
+                }
+                else
+                { 
+                    Console.WriteLine(" Hash of input: {0}", hash);
+                    Console.WriteLine("  Input string: {0}", testVal);
+                    Console.WriteLine("Cracked string: {0}", candidate);
+                    return;
+                }
+            }
         }
 
 
@@ -50,7 +89,7 @@ namespace Trello_Buzz
     /// </summary>
     class TrelloBuzz
     {
-        const string FIZZLETTERS = "acdegilmnoprstuw";
+        public const string FIZZLETTERS = "acdegilmnoprstuw";
         
         //TODO: Implement sanity check to ensure input contains only the values in FIZZLETTERS
         /// <summary>
@@ -108,9 +147,6 @@ namespace Trello_Buzz
             }
             return (hash(candidate) == target);
         }
-
     }
-
-
 }
 
